@@ -88,6 +88,19 @@ class Canvas(app.Canvas):
         gloo.clear(color=True, depth=True)
         self.program.draw('points')
 
+def dotproduct(v1, v2):
+    return sum((a*b) for a, b in zip(v1, v2))
+def length(v):
+    return math.sqrt(dotproduct(v, v))
+def angle_from_origin(x, y):
+    v1 = [1,0]
+    v2 = [x,y]
+    ang = math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+    if v2[1] < 0:
+        return (math.pi*2) - ang
+    else:
+        return ang
+
 def get_distance(a_x, a_y, b_x, b_y):
     return math.pow(((a_x-b_x)*(a_x-b_x) + (a_y-b_y)*(a_y-b_y)),.5)
 
@@ -138,39 +151,71 @@ class Fish():
         self.zone_attraction=15
         self.field_perception=200
         self.turning_rate=50
-        self.speed=1
-        self.speed_min=1
-        self.speed_max=5
+        self.speed=3
         self.time_step=0.1
+    def go():
+        zones = zone_check()
+        goal_angle = self.angle
+        if len(zones['repulse']):
+            goal_angle = repulse(zones['repulse'])
+        else if len(zones['orient']):
+            if len(zones['attract']):
+                goal_angle = 0.5 * (orient(zones['orient']) + attract(zones['attract']))
+            else:
+                goal_angle = orient(zones['orient'])
+        else if len(zones['attract']):
+            attract(zones['attract'])
+        if goal_angle != self.angle:
+            if abs(goal_angle - self.angle) or (360 - abs(goal_angle - self.angle)) <= self.turning_rate*self.time_step:
+                self.angle = goal_angle
+            else if goal_angle > self.angle:
+                if goal_angle - self.angle > 180
+
+
+
     def speed_up():
         self.speed += self.max_speed*self.time_step
         if self.speed > 5:
             self.speed = 5
+    def repulse(fishes):
+        sum_x, sum_y = unit_vector_sum(fishes)
+        sum_x *= -1
+        sum_y *= -1
+        return angle_from_origin(sum_x, sum_y)
+    def attract(fishes):
+        sum_x, sum_y = unit_vector_sum(fishes)
+        return angle_from_origin(sum_x, sum_y)
+    def orient(fishes):
+        angles = []
+        for fish in fishes:
+            angles.append(float(fish[2])
+        return sum(angles) / len(angles)
+    def unit_vector_sum(fishes):
+        sum_x = 0
+        sum_y = 0
+        for fish in fishes:
+            diff_x = self.x_position - fish[0]
+            dif_y = self.y_position - fish[1]
+            norm = get_distance(diff_x, diff_y, 0, 0)
+            sum_x += diff_x/norm
+            sum_y += diff_y/norm
+        return sum_x, sum_y
     def zone_check():
         potentials = get_close_fishes(self)
         # repulsion test
         zones = {}
+        zones['repulse'] = []
+        zones['orient'] = []
+        zones['attract'] = []
         for p in potentials:
-            p_x = p[0]
-            p_y = p[1]
-            if get_distance(self.x_position, self.y_position, p_x, p_y) <= unit*self.zone_repulsion:
-
-
-
-
-
-
-                if p_x >= self.x_position:
-                    self.angle += self.turning_rate*self.time_step
-                else:
-                    self.angle -= self.turning_rate*self.time_step
-
-
-
-def get_fishes(num_fishes):
-    for num in num_fishes:
-        # put exact coordinates at world coordinate
-
+            distance = get_distance(self.x_position, self.y_position, p[0], p[1])
+            if distance <= unit*self.zone_repulsion:
+                zones['repulse'].append(p)
+            else if distance <= unit*self.zone_orientation:
+                zones['orient'].append(p)
+            else if distance <= unit*self.zone_attraction:
+                zones['attract'].append(p)
+        return zones
 
 if __name__ == '__main__':
     WORLD = [[0 for x in range(canvasHeight)] for x in range(canvasWidth)]
