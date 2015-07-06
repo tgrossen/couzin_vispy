@@ -1,11 +1,13 @@
 from vispy import gloo, app
 import threading, math
+from math import pi
 import numpy as np
+from Fish import Fish
 
-WORLD = []
-canvasWidth = 1024
-canvasHeight = 768
-unit = 9
+#WORLD = []
+#canvasWidth = 1024
+#canvasHeight = 768
+#unit = 9
 
 VERT_SHADER = """
 attribute vec2  a_position;
@@ -88,137 +90,74 @@ class Canvas(app.Canvas):
         gloo.clear(color=True, depth=True)
         self.program.draw('points')
 
-def dotproduct(v1, v2):
-    return sum((a*b) for a, b in zip(v1, v2))
-def length(v):
-    return math.sqrt(dotproduct(v, v))
-def angle_from_origin(x, y):
-    v1 = [1,0]
-    v2 = [x,y]
-    ang = math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
-    if v2[1] < 0:
-        return (math.pi*2) - ang
-    else:
-        return ang
+# fish stuff and stuff #
 
-def get_distance(a_x, a_y, b_x, b_y):
-    return math.pow(((a_x-b_x)*(a_x-b_x) + (a_y-b_y)*(a_y-b_y)),.5)
-
-def get_close_fishes(fish):
-    p1_x = fish.x_position
-    p1_y = fish.y_position
-    p3_x = math.cos(fish.angle)+p1_x
-    p3_y = math.sin(fish.angle)+p1_y
-    potentials = []
-    # bounding box test -> initial get
-    for x in range(p1_x-(unit*fish.zone_attraction), p1_x+(unit*fish.zone_attraction)):
-        if x < 0 or x > canvasWidth:
-            continue
-        for y in range(p1_y-(unit*fish.zone_attraction), p1_y+(unit*fish.zone_attraction)):
-            if y < 0 or y > canvasHeight:
-                continue
-            #print str(x) + " " + str(y)
-            if WORLD[x][y] != 0 and not (x == p1_x and y == p1_y):
-                #print "OH MY GOSH"
-                potentials.append(WORLD[x][y])
-    # circle test
-    for p in potentials:
-        p2_x = p[0]
-        p2_y = p[1]
-        distance = get_distance(p2_x, p2_y, p1_x, p1_y)
-        if not distance <= (unit*fish.zone_attraction):
-            potentials.remove(p)
-        # perception test
+class WORLD():
+    def __init__(self, canvasWidth, canvasHeight, unit):
+        self.WORLD = []
+        self.canvasWidth = canvasWidth
+        self.canvasHeight = canvasHeight
+        self.unit = unit
+        self.fishes = []
+    def addFish(self, x, y, angle):
+        fishy_fish = Fish(self, x, y, angle)
+        fishy_fish.start()
+        self.fishes.append(fishy_fish)
+    def dotproduct(v1, v2):
+        return sum((a*b) for a, b in zip(v1, v2))
+    def length(v):
+        return math.sqrt(dotproduct(v, v))
+    def angle_from_origin(x, y):
+        v1 = [1,0]
+        v2 = [x,y]
+        ang = math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+        if v2[1] < 0:
+            return (pi*2) - ang
         else:
-            d12 = get_distance(p1_x, p1_y, p2_x, p2_y)
-            d13 = get_distance(p1_x, p1_y, p3_x, p3_y)
-            d23 = get_distance(p2_x, p2_y, p3_x, p3_y)
-            angle = math.acos((d12*d12 + d13*d13 - d23*d23)/(2 * d12 * d13))
-            # field of perception is in both directions, so we make sure angle smaller than half the field of perception
-            if angle > math.radians(fish.field_perception/2):
-                potentials.remove(p)
-            else:
-                print angle
-    return potentials
-
-class Fish():
-    def __init__(self, x, y, angle):
-        self.x_position=x
-        self.y_position=y
-        self.angle=angle
-        self.zone_repulsion=1
-        self.zone_orientation=7
-        self.zone_attraction=15
-        self.field_perception=200
-        self.turning_rate=50
-        self.speed=3
-        self.time_step=0.1
-    def go():
-        zones = zone_check()
-        goal_angle = self.angle
-        if len(zones['repulse']):
-            goal_angle = repulse(zones['repulse'])
-        else if len(zones['orient']):
-            if len(zones['attract']):
-                goal_angle = 0.5 * (orient(zones['orient']) + attract(zones['attract']))
-            else:
-                goal_angle = orient(zones['orient'])
-        else if len(zones['attract']):
-            attract(zones['attract'])
-        if goal_angle != self.angle:
-            if abs(goal_angle - self.angle) or (360 - abs(goal_angle - self.angle)) <= self.turning_rate*self.time_step:
-                self.angle = goal_angle
-            else if goal_angle > self.angle:
-                if goal_angle - self.angle > 180
-
-
-
-    def speed_up():
-        self.speed += self.max_speed*self.time_step
-        if self.speed > 5:
-            self.speed = 5
-    def repulse(fishes):
-        sum_x, sum_y = unit_vector_sum(fishes)
-        sum_x *= -1
-        sum_y *= -1
-        return angle_from_origin(sum_x, sum_y)
-    def attract(fishes):
-        sum_x, sum_y = unit_vector_sum(fishes)
-        return angle_from_origin(sum_x, sum_y)
-    def orient(fishes):
-        angles = []
-        for fish in fishes:
-            angles.append(float(fish[2])
-        return sum(angles) / len(angles)
-    def unit_vector_sum(fishes):
-        sum_x = 0
-        sum_y = 0
-        for fish in fishes:
-            diff_x = self.x_position - fish[0]
-            dif_y = self.y_position - fish[1]
-            norm = get_distance(diff_x, diff_y, 0, 0)
-            sum_x += diff_x/norm
-            sum_y += diff_y/norm
-        return sum_x, sum_y
-    def zone_check():
-        potentials = get_close_fishes(self)
-        # repulsion test
-        zones = {}
-        zones['repulse'] = []
-        zones['orient'] = []
-        zones['attract'] = []
+            return ang
+    def get_distance(a_x, a_y, b_x, b_y):
+        return math.pow(((a_x-b_x)*(a_x-b_x) + (a_y-b_y)*(a_y-b_y)),.5)
+    def get_close_fishes(self, fish):
+        p1_x = fish.x_position
+        p1_y = fish.y_position
+        p3_x = math.cos(fish.angle)+p1_x
+        p3_y = math.sin(fish.angle)+p1_y
+        potentials = []
+        # bounding box test -> initial get
+        for x in range(p1_x-(unit*fish.zone_attraction), p1_x+(unit*fish.zone_attraction)):
+            if x < 0 or x > canvasWidth:
+                continue
+            for y in range(p1_y-(unit*fish.zone_attraction), p1_y+(unit*fish.zone_attraction)):
+                if y < 0 or y > canvasHeight:
+                    continue
+                #print str(x) + " " + str(y)
+                if self.WORLD[x][y] != 0 and not (x == p1_x and y == p1_y):
+                    #print "OH MY GOSH"
+                    potentials.append(self.WORLD[x][y])
+        # circle test
         for p in potentials:
-            distance = get_distance(self.x_position, self.y_position, p[0], p[1])
-            if distance <= unit*self.zone_repulsion:
-                zones['repulse'].append(p)
-            else if distance <= unit*self.zone_orientation:
-                zones['orient'].append(p)
-            else if distance <= unit*self.zone_attraction:
-                zones['attract'].append(p)
-        return zones
+            p2_x = p[0]
+            p2_y = p[1]
+            distance = get_distance(p2_x, p2_y, p1_x, p1_y)
+            if not distance <= (unit*fish.zone_attraction):
+                potentials.remove(p)
+            # perception test
+            else:
+                d12 = get_distance(p1_x, p1_y, p2_x, p2_y)
+                d13 = get_distance(p1_x, p1_y, p3_x, p3_y)
+                d23 = get_distance(p2_x, p2_y, p3_x, p3_y)
+                angle = math.acos((d12*d12 + d13*d13 - d23*d23)/(2 * d12 * d13))
+                # field of perception is in both directions, so we make sure angle smaller than half the field of perception
+                if angle > math.radians(fish.field_perception/2):
+                    potentials.remove(p)
+                else:
+                    print angle
+        return potentials
+    def init_world(self):
+        self.WORLD = [[0 for x in range(canvasHeight)] for x in range(canvasWidth)]
 
 if __name__ == '__main__':
-    WORLD = [[0 for x in range(canvasHeight)] for x in range(canvasWidth)]
+    init_world()
     c = Canvas()
     app.run()
 
