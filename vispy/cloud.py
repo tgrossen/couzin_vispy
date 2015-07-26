@@ -185,17 +185,18 @@ void main()
 }
 """
 
+n = 5
+
 # ------------------------------------------------------------ Canvas class ---
 class Canvas(app.Canvas):
 
     def __init__(self, world):
+        app.Canvas.__init__(self, keys='interactive', size=(1024, 768))
         self.world = world
-        n = len(world.fishes)
         self.plot = np.zeros(n, [('a_position', np.float32, 3),
                             ('a_bg_color', np.float32, 4),
                             ('a_fg_color', np.float32, 4),
                             ('a_size', np.float32, 1)])
-        app.Canvas.__init__(self, keys='interactive', size=(1024, 768))
         ps = self.pixel_scale
 
         # plot = np.zeros(n, [('a_position', np.float32, 3),
@@ -219,7 +220,7 @@ class Canvas(app.Canvas):
 
         self.apply_zoom()
 
-        self.program.bind(gloo.VertexBuffer(self.plot))
+        #self.program.bind(gloo.VertexBuffer(self.plot))
         self.program['u_linewidth'] = u_linewidth
         self.program['u_antialias'] = u_antialias
         self.program['u_model'] = self.model
@@ -257,9 +258,10 @@ class Canvas(app.Canvas):
         # self.plot['a_position'] = 0.45 * np.random.randn(n, 3)
 
     def on_timer(self, event):
-        self.set_plot()
-        self.program.bind(gloo.VertexBuffer(self.plot))
-        input("Press Enter to continue...")
+        if len(self.world.fishes):
+            self.set_plot()
+            self.program.bind(gloo.VertexBuffer(self.plot))
+        #input("Press Enter to continue...")
         # self.theta += .5
         # self.phi += .5
         # self.model = np.dot(rotate(self.theta, (0, 0, 1)),
@@ -290,7 +292,6 @@ class Canvas(app.Canvas):
         self.program['u_projection'] = self.projection
 
 if __name__ == '__main__':
-    n = 5
     # plot = np.zeros(n, [('a_position', np.float32, 3),
     #                         ('a_bg_color', np.float32, 4),
     #                         ('a_fg_color', np.float32, 4),
@@ -299,5 +300,5 @@ if __name__ == '__main__':
     world = World(1024, 768, 9)
     world.init_world()
     c = Canvas(world)
-    world.add_random_fishes(5)
+    world.add_random_fishes(n)
     app.run()
