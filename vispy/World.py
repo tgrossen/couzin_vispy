@@ -19,7 +19,7 @@ class World():
             self.addFish(randint(0, self.canvasWidth), randint(0, self.canvasHeight), randint(0, 360))
     def addFish(self, x, y, angle):
         fishy_fish = Fish(self, x, y, angle)
-        fishy_fish.start()
+        #fishy_fish.start()
         self.fishes.append(fishy_fish)
     def dotproduct(self, v1, v2):
         return sum((a*b) for a, b in zip(v1, v2))

@@ -220,7 +220,7 @@ class Canvas(app.Canvas):
 
         self.apply_zoom()
 
-        #self.program.bind(gloo.VertexBuffer(self.plot))
+        self.program.bind(gloo.VertexBuffer(self.plot))
         self.program['u_linewidth'] = u_linewidth
         self.program['u_antialias'] = u_antialias
         self.program['u_model'] = self.model
@@ -252,15 +252,15 @@ class Canvas(app.Canvas):
         for fish in self.world.fishes:
             self.plot['a_position'][x][0] = (fish.x_position - (self.world.canvasWidth/2.0)) / (self.world.canvasWidth/4.0)
             self.plot['a_position'][x][1] = (fish.y_position - (self.world.canvasHeight/2.0)) / (self.world.canvasHeight/4.0)
-            print str(self.plot['a_position'][x][0]) + ' ' + str(self.plot['a_position'][x][1])
+            print str(self.plot['a_position'][x][0]) + ' ' + str(self.plot['a_position'][x][1]) 
             self.plot['a_position'][x][2] = 0
             x += 1
-        # self.plot['a_position'] = 0.45 * np.random.randn(n, 3)
+        self.program.bind(gloo.VertexBuffer(self.plot))
 
     def on_timer(self, event):
         if len(self.world.fishes):
             self.set_plot()
-            self.program.bind(gloo.VertexBuffer(self.plot))
+            #self.program.bind(gloo.VertexBuffer(self.plot))
         #input("Press Enter to continue...")
         # self.theta += .5
         # self.phi += .5
