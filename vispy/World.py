@@ -14,6 +14,11 @@ class World():
     def setAndGo(self):
         self.init_world()
         self.addFish()
+    def add_fish_swarm(self, count):
+        startX = 200
+        startY = 200
+        for x in range(0, count):
+            self.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(0, 360))
     def add_random_fishes(self, count):
         for x in range(0, count):
             self.addFish(randint(0, self.canvasWidth), randint(0, self.canvasHeight), randint(0, 360))
@@ -28,7 +33,10 @@ class World():
     def angle_from_origin(self, x, y):
         v1 = [1,0]
         v2 = [x,y]
-        ang = math.acos(self.dotproduct(v1, v2) / (self.length(v1) * self.length(v2)))
+        try:
+            ang = math.acos(self.dotproduct(v1, v2) / (self.length(v1) * self.length(v2)))
+        except ZeroDivisionError:
+            ang = 0
         if v2[1] < 0:
             return (pi*2) - ang
         else:
@@ -48,9 +56,9 @@ class World():
         y_max = p1_y+(self.unit*fish.zone_attraction)
 
         potentials = []
-        potentials = filter(lambda other_fish: other_fish != fish and
-            other_fish.x_position in range(x_min, x_max) and
-            other_fish.y_position in range(y_min, y_max), self.fishes)
+        potentials = filter(lambda other_fish: other_fish.identifier != fish.identifier and
+            int(other_fish.x_position) in range(x_min, x_max) and
+            int(other_fish.y_position) in range(y_min, y_max), self.fishes)
         # bounding box test -> initial get
         # for x in range(p1_x-(self.unit*fish.zone_attraction), p1_x+(self.unit*fish.zone_attraction)):
         #     if x < 0 or x > self.canvasWidth:
@@ -76,7 +84,10 @@ class World():
                 d12 = self.get_distance(p1_x, p1_y, p2_x, p2_y)
                 d13 = self.get_distance(p1_x, p1_y, p3_x, p3_y)
                 d23 = self.get_distance(p2_x, p2_y, p3_x, p3_y)
-                angle = math.acos((d12*d12 + d13*d13 - d23*d23)/(2 * d12 * d13))
+                try:
+                    angle = math.acos((d12*d12 + d13*d13 - d23*d23)/(2 * d12 * d13))
+                except ZeroDivisionError:
+                    angle = 0
                 # field of perception is in both directions, so we make sure angle smaller than half the field of perception
                 if angle > math.radians(fish.field_perception/2):
                     potentials.remove(other_fish)

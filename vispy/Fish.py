@@ -11,8 +11,8 @@ class Fish():
         self.zone_orientation=7
         self.zone_attraction=15
         self.field_perception=200
-        self.turning_rate=50
-        self.speed=9
+        self.turning_rate=150
+        self.speed=27
         self.time_step=0.1
         self.is_running=False
         self.world=world
@@ -52,7 +52,7 @@ class Fish():
             else:
                 goal_angle = self.orient(zones['orient'])
         elif len(zones['attract']):
-            self.attract(zones['attract'])
+            goal_angle = self.attract(zones['attract'])
         if goal_angle != self.angle:
             if abs(goal_angle - self.angle) <= self.turning_rate*self.time_step or (360 - abs(goal_angle - self.angle)) <= self.turning_rate*self.time_step:
                 self.angle = goal_angle
@@ -129,8 +129,14 @@ class Fish():
             diff_x = self.x_position - fish.x_position
             diff_y = self.y_position - fish.y_position
             norm = self.get_distance(diff_x, diff_y, 0, 0)
-            sum_x += diff_x/norm
-            sum_y += diff_y/norm
+            try:
+                sum_x += diff_x/norm
+            except ZeroDivisionError:
+                sum_x = 0
+            try:
+                sum_y += diff_y/norm
+            except ZeroDivisionError:
+                sum_y = 0
         return sum_x, sum_y
     def zone_check(self):
         potentials = self.world.get_close_fishes(self)
@@ -148,15 +154,14 @@ class Fish():
                 zones['attract'].append(p)
         return zones
 
-def monitor(fish, fish2, fish3):
-    fish_x = 0
-    fish_y = 0
-    while True:
-        if fish_x != fish.x_position or fish_y != fish.y_position:
-            fish_x = fish.x_position
-            fish_y = fish.y_position
-            print fish_x, fish_y, fish.angle
-            print fish2.x_position, fish2.y_position, fish2.angle
-            print fish3.x_position, fish3.y_position, fish3.angle
-            print ""
-
+# def monitor(fish, fish2, fish3):
+#     fish_x = 0
+#     fish_y = 0
+#     while True:
+#         if fish_x != fish.x_position or fish_y != fish.y_position:
+#             fish_x = fish.x_position
+#             fish_y = fish.y_position
+#             print fish_x, fish_y, fish.angle
+#             print fish2.x_position, fish2.y_position, fish2.angle
+#             print fish3.x_position, fish3.y_position, fish3.angle
+#             print ""

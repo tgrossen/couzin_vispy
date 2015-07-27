@@ -36,7 +36,7 @@ class Canvas(app.Canvas):
         data = np.random.uniform(0, 0, size=(n, 2))
         self.a_position = data.astype(np.float32)
         self.program['a_position'] = self.a_position #center position array of the fish pixels
-        self.program['u_size'] = 20 #size of the fish pixels
+        self.program['u_size'] = 3 #size of the fish pixels
         
         self.timer = app.Timer('auto', connect=self.on_timer, start=True)
 
@@ -75,6 +75,6 @@ if __name__ == '__main__':
     world = World(1024, 768, 9)
     world.init_world()
     c = Canvas(world)
-    world.add_random_fishes(n)
+    world.add_fish_swarm(n)
     if sys.flags.interactive != 1:
         app.run()
