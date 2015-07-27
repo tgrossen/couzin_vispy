@@ -24,7 +24,7 @@ void main() {
 }
 """
 
-n = 1
+n = 50
 
 class Canvas(app.Canvas):
     def __init__(self, world):
@@ -42,6 +42,17 @@ class Canvas(app.Canvas):
 
         self.show()
 
+    def on_key_press(self, event):
+        if event.text == ' ':
+            if self.timer.running:
+                self.timer.stop()
+                for fish in self.world.fishes:
+                    fish.stop()
+            else:
+                self.timer.start()
+                for fish in self.world.fishes:
+                    fish.start()
+
     def on_resize(self, event):
         width, height = event.size
         gloo.set_viewport(0, 0, width, height)
@@ -53,9 +64,9 @@ class Canvas(app.Canvas):
     def on_timer(self, event):
         x = 0
         for fish in self.world.fishes:
-            print self.a_position[x]
-            self.a_position[x][0] = self.a_position[x][0] + 0.01 #(fish.x_position - (self.world.canvasWidth/2.0)) / (self.world.canvasWidth/2.0)   #the X-Position
-            self.a_position[x][1] = self.a_position[x][1] - 0.01 #(fish.y_position - (self.world.canvasHeight/2.0)) / (self.world.canvasHeight/2.0) #the Y-Position
+            # print self.a_position[x]
+            self.a_position[x][0] = (fish.x_position - (self.world.canvasWidth/2.0)) / (self.world.canvasWidth/2.0)   #the X-Position
+            self.a_position[x][1] = (fish.y_position - (self.world.canvasHeight/2.0)) / (self.world.canvasHeight/2.0) #the Y-Position
             x += 1
         self.program['a_position'] = self.a_position
         self.update()

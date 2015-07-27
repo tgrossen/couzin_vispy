@@ -36,30 +36,41 @@ class World():
     def get_distance(self, a_x, a_y, b_x, b_y):
         return math.pow(((a_x-b_x)*(a_x-b_x) + (a_y-b_y)*(a_y-b_y)),.5)
     def get_close_fishes(self, fish):
+        # if len(self.fishes) == 1:
+        #     return []
         p1_x = int(fish.x_position)
         p1_y = int(fish.y_position)
         p3_x = math.cos(fish.angle)+p1_x
         p3_y = math.sin(fish.angle)+p1_y
+        x_min = p1_x-(self.unit*fish.zone_attraction)
+        x_max = p1_x+(self.unit*fish.zone_attraction)
+        y_min = p1_y-(self.unit*fish.zone_attraction)
+        y_max = p1_y+(self.unit*fish.zone_attraction)
+
         potentials = []
+        potentials = filter(lambda other_fish: other_fish != fish and
+            other_fish.x_position in range(x_min, x_max) and
+            other_fish.y_position in range(y_min, y_max), self.fishes)
         # bounding box test -> initial get
-        for x in range(p1_x-(self.unit*fish.zone_attraction), p1_x+(self.unit*fish.zone_attraction)):
-            if x < 0 or x > self.canvasWidth:
-                continue
-            for y in range(p1_y-(self.unit*fish.zone_attraction), p1_y+(self.unit*fish.zone_attraction)):
-                if y < 0 or y > self.canvasHeight:
-                    continue
-                #print str(x) + " " + str(y)
-                if x in range(0, self.canvasWidth) and y in range(0, self.canvasHeight):
-                    if self.WORLD[x][y] != 0 and not (x == p1_x and y == p1_y):
-                        #print "OH MY GOSH"
-                        potentials.append(self.WORLD[x][y])
+        # for x in range(p1_x-(self.unit*fish.zone_attraction), p1_x+(self.unit*fish.zone_attraction)):
+        #     if x < 0 or x > self.canvasWidth:
+        #         continue
+        #     for y in range(p1_y-(self.unit*fish.zone_attraction), p1_y+(self.unit*fish.zone_attraction)):
+        #         if y < 0 or y > self.canvasHeight:
+        #             continue
+        #         #print str(x) + " " + str(y)
+        #         if x in range(0, self.canvasWidth) and y in range(0, self.canvasHeight):
+        #             if self.WORLD[x][y] != 0 and self.WORLD[x][y][3] != fish.identifier:
+        #                 print "OH MY GOSH"
+        #                 print "x:{x} y:{y} p1_x:{p1_x} p1_y:{p1_y}".format(x=x, y=y, p1_x=p1_x, p1_y=p1_y)
+        #                 potentials.append(self.WORLD[x][y])
         # circle test
-        for p in potentials:
-            p2_x = p[0]
-            p2_y = p[1]
-            distance = self.get_distance(p2_x, p2_y, p1_x, p1_y)
+        for other_fish in potentials:
+            p2_x = other_fish.x_position
+            p2_y = other_fish.y_position
+            distance = self.get_distance(p2_x, p2_y, fish.x_position, fish.y_position)
             if not distance <= (self.unit*fish.zone_attraction):
-                potentials.remove(p)
+                potentials.remove(other_fish)
             # perception test
             else:
                 d12 = self.get_distance(p1_x, p1_y, p2_x, p2_y)
@@ -68,7 +79,7 @@ class World():
                 angle = math.acos((d12*d12 + d13*d13 - d23*d23)/(2 * d12 * d13))
                 # field of perception is in both directions, so we make sure angle smaller than half the field of perception
                 if angle > math.radians(fish.field_perception/2):
-                    potentials.remove(p)
+                    potentials.remove(other_fish)
                 #else:
                 #    print angle
         return potentials

@@ -1,5 +1,6 @@
 import threading, math
 from math import pi
+from random import randint
 
 class Fish():
     def __init__(self, world, x, y, angle):
@@ -11,10 +12,11 @@ class Fish():
         self.zone_attraction=15
         self.field_perception=200
         self.turning_rate=50
-        self.speed=3
+        self.speed=9
         self.time_step=0.1
         self.is_running=False
         self.world=world
+        self.identifier="fish" + str(randint(0,1000000))
         #self.start()
     def _run(self):
         self.is_running=False
@@ -26,7 +28,8 @@ class Fish():
             self._timer.start()
             self.is_running = True
     def stop(self):
-        self._timer.cancel()
+        if hasattr(self, '_timer'):
+            self._timer.cancel()
         self.is_running = False
     def increase_angle(self):
         self.angle += self.turning_rate*self.time_step
@@ -105,7 +108,7 @@ class Fish():
         self.evaluate_and_turn()
         self.move_forward()
         self.world.WORLD[int(self.x_position)][int(self.y_position)] = 0
-        self.world.WORLD[int(self.x_position)][int(self.y_position)] = [self.x_position, self.y_position, self.angle]
+        self.world.WORLD[int(self.x_position)][int(self.y_position)] = [self.x_position, self.y_position, self.angle, self.identifier]
     def repulse(self, fishes):
         sum_x, sum_y = self.unit_vector_sum(fishes)
         sum_x *= -1
@@ -117,14 +120,14 @@ class Fish():
     def orient(self, fishes):
         angles = []
         for fish in fishes:
-            angles.append(float(fish[2]))
+            angles.append(float(fish.angle))
         return sum(angles) / len(angles)
     def unit_vector_sum(self, fishes):
         sum_x = 0
         sum_y = 0
         for fish in fishes:
-            diff_x = self.x_position - fish[0]
-            diff_y = self.y_position - fish[1]
+            diff_x = self.x_position - fish.x_position
+            diff_y = self.y_position - fish.y_position
             norm = self.get_distance(diff_x, diff_y, 0, 0)
             sum_x += diff_x/norm
             sum_y += diff_y/norm
@@ -136,7 +139,7 @@ class Fish():
         zones['orient'] = []
         zones['attract'] = []
         for p in potentials:
-            distance = self.get_distance(self.x_position, self.y_position, p[0], p[1])
+            distance = self.get_distance(self.x_position, self.y_position, p.x_position, p.y_position)
             if distance <= self.world.unit*self.zone_repulsion:
                 zones['repulse'].append(p)
             elif distance <= self.world.unit*self.zone_orientation:
