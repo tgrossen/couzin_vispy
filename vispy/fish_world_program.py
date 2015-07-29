@@ -72,9 +72,10 @@ class Canvas(app.Canvas):
         self.update()
 
 if __name__ == '__main__':
-    world = World(1024, 768, 9)
+    world = World(1024, 768, 3)
     world.init_world()
     c = Canvas(world)
     world.add_fish_swarm(n)
+    #world.add_test_fishes(n)
     if sys.flags.interactive != 1:
         app.run()

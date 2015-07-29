@@ -3,20 +3,21 @@ from math import pi
 from random import randint
 
 class Fish():
-    def __init__(self, world, x, y, angle):
+    def __init__(self, world, x, y, angle, log=False):
         self.x_position=x
         self.y_position=y
-        self.angle=angle
+        self.angle=math.radians(angle)
         self.zone_repulsion=1
         self.zone_orientation=7
         self.zone_attraction=15
         self.field_perception=200
-        self.turning_rate=150
-        self.speed=27
+        self.turning_rate=math.radians(150)
+        self.speed=9
         self.time_step=0.1
         self.is_running=False
         self.world=world
         self.identifier="fish" + str(randint(0,1000000))
+        self.log=log
         #self.start()
     def _run(self):
         self.is_running=False
@@ -32,13 +33,15 @@ class Fish():
             self._timer.cancel()
         self.is_running = False
     def increase_angle(self):
+        print "INCREASE"
         self.angle += self.turning_rate*self.time_step
-        if self.angle > 360:
-            self.angle -= 360
+        if self.angle > pi*2:
+            self.angle -= pi*2
     def decrease_angle(self):
+        print "DECREASE"
         self.angle -= self.turning_rate*self.time_step
         if self.angle < 0:
-            self.angle += 360
+            self.angle += pi*2
     def get_distance(self, a_x, a_y, b_x, b_y):
         return math.pow(((a_x-b_x)*(a_x-b_x) + (a_y-b_y)*(a_y-b_y)),.5)
     def evaluate_and_turn(self):
@@ -53,24 +56,26 @@ class Fish():
                 goal_angle = self.orient(zones['orient'])
         elif len(zones['attract']):
             goal_angle = self.attract(zones['attract'])
+        if self.log:
+            print "SA: " + str(self.angle) + " GA: " + str(goal_angle)
         if goal_angle != self.angle:
-            if abs(goal_angle - self.angle) <= self.turning_rate*self.time_step or (360 - abs(goal_angle - self.angle)) <= self.turning_rate*self.time_step:
+            if abs(goal_angle - self.angle) <= self.turning_rate*self.time_step or (pi*2 - abs(goal_angle - self.angle)) <= self.turning_rate*self.time_step:
                 self.angle = goal_angle
             elif goal_angle > self.angle:
-                if goal_angle - self.angle > 180:
+                if goal_angle - self.angle > pi:
                     self.decrease_angle()
                 else:
                     self.increase_angle()
             elif goal_angle < self.angle:
-                if goal_angle - self.angle > 180:
+                if goal_angle - self.angle > pi:
                     self.increase_angle()
                 else:
                     self.decrease_angle()
-        if self.angle >= 360:
-            self.angle -= 360
+        if self.angle >= pi*2:
+            self.angle -= pi*2
     def move_forward(self):
         move_vector = self.speed*self.time_step
-        eval_angle = math.radians(self.angle)
+        eval_angle = self.angle
         if eval_angle == 0:
             self.x_position += move_vector
         elif eval_angle > 0 and eval_angle < pi/2:
@@ -126,18 +131,18 @@ class Fish():
         sum_x = 0
         sum_y = 0
         for fish in fishes:
-            diff_x = self.x_position - fish.x_position
-            diff_y = self.y_position - fish.y_position
+            diff_x = abs(self.x_position - fish.x_position)
+            diff_y = abs(self.y_position - fish.y_position)
             norm = self.get_distance(diff_x, diff_y, 0, 0)
             try:
                 sum_x += diff_x/norm
             except ZeroDivisionError:
-                sum_x = 0
+                sum_x += 0
             try:
                 sum_y += diff_y/norm
             except ZeroDivisionError:
-                sum_y = 0
-        return sum_x, sum_y
+                sum_y += 0
+        return sum_x/len(fishes), sum_y/len(fishes)
     def zone_check(self):
         potentials = self.world.get_close_fishes(self)
         zones = {}

@@ -14,6 +14,15 @@ class World():
     def setAndGo(self):
         self.init_world()
         self.addFish()
+    def add_test_fishes(self, count):
+        if count == 2:
+            self.addFish(50, 50, 90)
+            self.addFish(50, 250, 270)
+        if count == 4:
+            self.addFish(300, 300, 45, log=True)
+            self.addFish(310, 310, 45)
+            self.addFish(310, 300, 45)
+            self.addFish(300, 600, 360-45)
     def add_fish_swarm(self, count):
         startX = 200
         startY = 200
@@ -21,9 +30,9 @@ class World():
             self.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(0, 360))
     def add_random_fishes(self, count):
         for x in range(0, count):
-            self.addFish(randint(0, self.canvasWidth), randint(0, self.canvasHeight), randint(0, 360))
-    def addFish(self, x, y, angle):
-        fishy_fish = Fish(self, x, y, angle)
+            self.addFish(randint(0, self.canvasWidth/2), randint(0, self.canvasHeight/2), randint(0, 360))
+    def addFish(self, x, y, angle, log=False):
+        fishy_fish = Fish(self, x, y, angle, log)
         #fishy_fish.start()
         self.fishes.append(fishy_fish)
     def dotproduct(self, v1, v2):
@@ -85,7 +94,13 @@ class World():
                 d13 = self.get_distance(p1_x, p1_y, p3_x, p3_y)
                 d23 = self.get_distance(p2_x, p2_y, p3_x, p3_y)
                 try:
-                    angle = math.acos((d12*d12 + d13*d13 - d23*d23)/(2 * d12 * d13))
+                    num = (d12*d12 + d13*d13 - d23*d23)/(2 * d12 * d13)
+                    if num > 1.0:
+                        angle = 0
+                    elif num < -1.0:
+                        angle = pi
+                    else:
+                        angle = math.acos(num)
                 except ZeroDivisionError:
                     angle = 0
                 # field of perception is in both directions, so we make sure angle smaller than half the field of perception
