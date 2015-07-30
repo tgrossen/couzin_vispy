@@ -24,7 +24,7 @@ void main() {
 }
 """
 
-n = 50
+n = 6
 
 class Canvas(app.Canvas):
     def __init__(self, world):
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     world = World(1024, 768, 3)
     world.init_world()
     c = Canvas(world)
-    world.add_fish_swarm(n)
-    #world.add_test_fishes(n)
+    #world.add_fish_swarm(n)
+    world.add_test_fishes(n)
     if sys.flags.interactive != 1:
         app.run()

@@ -23,6 +23,13 @@ class World():
             self.addFish(310, 310, 45)
             self.addFish(310, 300, 45)
             self.addFish(300, 600, 360-45)
+        if count == 6:
+            self.addFish(300, 300, 45, log=True)
+            self.addFish(310, 310, 45)
+            self.addFish(310, 300, 45)
+            self.addFish(300, 600, 360-45)
+            self.addFish(310, 610, 360-45)
+            self.addFish(310, 600, 360-45)
     def add_fish_swarm(self, count):
         startX = 200
         startY = 200

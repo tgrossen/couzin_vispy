@@ -8,11 +8,11 @@ class Fish():
         self.y_position=y
         self.angle=math.radians(angle)
         self.zone_repulsion=1
-        self.zone_orientation=7
-        self.zone_attraction=15
+        self.zone_orientation=15
+        self.zone_attraction=7
         self.field_perception=200
         self.turning_rate=math.radians(150)
-        self.speed=9
+        self.speed=3
         self.time_step=0.1
         self.is_running=False
         self.world=world
@@ -33,12 +33,10 @@ class Fish():
             self._timer.cancel()
         self.is_running = False
     def increase_angle(self):
-        print "INCREASE"
         self.angle += self.turning_rate*self.time_step
         if self.angle > pi*2:
             self.angle -= pi*2
     def decrease_angle(self):
-        print "DECREASE"
         self.angle -= self.turning_rate*self.time_step
         if self.angle < 0:
             self.angle += pi*2
@@ -67,7 +65,7 @@ class Fish():
                 else:
                     self.increase_angle()
             elif goal_angle < self.angle:
-                if goal_angle - self.angle > pi:
+                if abs(goal_angle - self.angle) > pi:
                     self.increase_angle()
                 else:
                     self.decrease_angle()
