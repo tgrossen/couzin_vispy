@@ -4,6 +4,7 @@ import sys
 
 from vispy import gloo
 from vispy import app
+from random import randint
 import numpy as np
 import random, argparse
 from World import World
@@ -82,6 +83,32 @@ def readCommandLine():
     parser.add_argument('--log', required=False, default=False, help='Boolean value for logging or no logging')
     return parser.parse_args()
 
+def add_test_fishes(world, count, log=False, speed=1):
+    if count == 2:
+        world.addFish(50, 50, 90, speed=speed)
+        world.addFish(50, 250, 270, speed=speed)
+    if count == 4:
+        world.addFish(300, 300, 45, log=log, speed=speed)
+        world.addFish(310, 310, 45, speed=speed)
+        world.addFish(310, 300, 45, speed=speed)
+        world.addFish(300, 600, 360-45, speed=speed)
+    if count == 6:
+        world.addFish(300, 300, 45, log=log, speed=speed)
+        world.addFish(310, 310, 45, speed=speed)
+        world.addFish(310, 300, 45, speed=speed)
+        world.addFish(300, 600, 360-45, speed=speed)
+        world.addFish(310, 610, 360-45, speed=speed)
+        world.addFish(310, 600, 360-45, speed=speed)
+
+def add_fish_swarm(world, count, log=False, speed=1):
+    startX = 200
+    startY = 200
+    for x in range(0, count):
+        world.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(0, 360), log=log, speed=speed)
+def add_random_fishes(world, count, log=False, speed=1):
+    for x in range(0, count):
+        world.addFish(randint(0, world.canvasWidth/2), randint(0, world.canvasHeight/2), randint(0, 360), log=log, speed=speed)
+
 if __name__ == '__main__':
     try:
         args = readCommandLine()
@@ -98,8 +125,8 @@ if __name__ == '__main__':
     world.init_world()
     c = Canvas(world)
     if n < 50:
-        world.add_test_fishes(n, log, speed)
+        add_test_fishes(world, n, log, speed)
     else:
-        world.add_fish_swarm(n, log, speed)
+        add_fish_swarm(world, n, log, speed)
     if sys.flags.interactive != 1:
         app.run()
