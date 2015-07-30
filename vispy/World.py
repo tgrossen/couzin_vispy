@@ -2,6 +2,7 @@ import threading, math
 from math import pi
 import numpy as np
 from random import randint
+from copy import deepcopy
 from Fish import Fish
 
 class World():
@@ -14,8 +15,8 @@ class World():
     def setAndGo(self):
         self.init_world()
         self.addFish()
-    def addFish(self, x, y, angle, log=False, speed=1):
-        fishy_fish = Fish(self, x, y, angle, log=log, speed=speed)
+    def addFish(self, x, y, angle, log=False, speed=1, identifier=None):
+        fishy_fish = Fish(self, x, y, angle, log=log, speed=speed, identifier=identifier)
         self.fishes.append(fishy_fish)
     def dotproduct(self, v1, v2):
         return sum((a*b) for a, b in zip(v1, v2))
@@ -46,30 +47,30 @@ class World():
         y_min = p1_y-(self.unit*fish.zone_attraction)
         y_max = p1_y+(self.unit*fish.zone_attraction)
 
-        potentials = []
-        potentials = filter(lambda other_fish: other_fish.identifier != fish.identifier and
+        fish.potentials = []
+        fish.potentials = filter(lambda other_fish: other_fish.identifier != fish.identifier and
             int(other_fish.x_position) in range(x_min, x_max) and
             int(other_fish.y_position) in range(y_min, y_max), self.fishes)
-        # bounding box test -> initial get
-        # for x in range(p1_x-(self.unit*fish.zone_attraction), p1_x+(self.unit*fish.zone_attraction)):
-        #     if x < 0 or x > self.canvasWidth:
-        #         continue
-        #     for y in range(p1_y-(self.unit*fish.zone_attraction), p1_y+(self.unit*fish.zone_attraction)):
-        #         if y < 0 or y > self.canvasHeight:
-        #             continue
-        #         #print str(x) + " " + str(y)
-        #         if x in range(0, self.canvasWidth) and y in range(0, self.canvasHeight):
-        #             if self.WORLD[x][y] != 0 and self.WORLD[x][y][3] != fish.identifier:
-        #                 print "OH MY GOSH"
-        #                 print "x:{x} y:{y} p1_x:{p1_x} p1_y:{p1_y}".format(x=x, y=y, p1_x=p1_x, p1_y=p1_y)
-        #                 potentials.append(self.WORLD[x][y])
-        # circle test
-        for other_fish in potentials:
+        # if fish.log:
+        #     print "len(potentials): " + str(len(potentials))
+        #     for other_fish in potentials:
+        #         print "potential: " + str(other_fish.identifier)
+        remove = []
+        for other_fish in fish.potentials:
+            # if fish.log:
+            #     print "len(fish.potentials): " + str(len(fish.potentials))
+            #     for fishy_fish in fish.potentials:
+            #         print "potential: " + str(fishy_fish.identifier)
+            # if fish.log:
+            #     print "EVALUATE: " + str(other_fish.identifier)
             p2_x = other_fish.x_position
             p2_y = other_fish.y_position
             distance = self.get_distance(p2_x, p2_y, fish.x_position, fish.y_position)
             if not distance <= (self.unit*fish.zone_attraction):
-                potentials.remove(other_fish)
+                if fish.log:
+                    print str(fish.identifier) + ": remove: " + str(other_fish.identifier)
+                # fish.potentials.remove(other_fish)
+                remove.append(other_fish.identifier)
             # perception test
             else:
                 d12 = self.get_distance(p1_x, p1_y, p2_x, p2_y)
@@ -86,10 +87,14 @@ class World():
                 except ZeroDivisionError:
                     angle = 0
                 # field of perception is in both directions, so we make sure angle smaller than half the field of perception
+                if fish.log:
+                    print str(fish.identifier) + ": " + str(other_fish.identifier) + ": " + str(math.degrees(angle))
                 if angle > math.radians(fish.field_perception/2):
-                    potentials.remove(other_fish)
+                    # fish.potentials.remove(other_fish)
+                    remove.append(other_fish.identifier)
                 #else:
                 #    print angle
-        return potentials
+        fish.potentials = filter(lambda f: f.identifier not in remove, fish.potentials)
+        return fish.potentials
     def init_world(self):
         self.WORLD = [[0 for x in range(self.canvasHeight)] for x in range(self.canvasWidth)]

@@ -81,11 +81,13 @@ class Canvas(app.Canvas):
         self.speed *= 2
         for fish in self.world.fishes:
             fish.speed = self.speed
+        print "Speed increased to: " + str(self.speed)
 
     def decrease_speed(self):
         self.speed /= 2
         for fish in self.world.fishes:
             fish.speed = self.speed
+        print "Speed decreased to: " + str(self.speed)
 
     def on_key_press(self, event):
         if event.text == ' ':
@@ -133,17 +135,17 @@ def add_test_fishes(world, count, log=False, speed=1):
         world.addFish(50, 50, 90, speed=speed)
         world.addFish(50, 250, 270, speed=speed)
     if count == 4:
-        world.addFish(300, 300, 45, log=log, speed=speed)
-        world.addFish(310, 310, 45, speed=speed)
-        world.addFish(310, 300, 45, speed=speed)
-        world.addFish(300, 600, 360-45, speed=speed)
+        world.addFish(300, 300, 45, log=log, speed=speed, identifier=1)
+        world.addFish(310, 310, 45, speed=speed, identifier=2)
+        world.addFish(310, 300, 45, speed=speed, identifier=3)
+        world.addFish(300, 600, 360-45, speed=speed, identifier=4)
     if count == 6:
-        world.addFish(300, 300, 45, log=log, speed=speed)
+        world.addFish(300, 300, 45, speed=speed)
         world.addFish(310, 310, 45, speed=speed)
         world.addFish(310, 300, 45, speed=speed)
         world.addFish(300, 600, 360-45, speed=speed)
         world.addFish(310, 610, 360-45, speed=speed)
-        world.addFish(310, 600, 360-45, speed=speed)
+        world.addFish(310, 600, 360-45, log=log, speed=speed)
 
 def add_fish_swarm(world, count, log=False, speed=1):
     startX = 200

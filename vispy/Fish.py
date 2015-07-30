@@ -3,7 +3,7 @@ from math import pi
 from random import randint
 
 class Fish():
-    def __init__(self, world, x, y, angle, log=False, speed=1):
+    def __init__(self, world, x, y, angle, log=False, speed=1, identifier=None):
         self.x_position=x
         self.y_position=y
         self.angle=math.radians(angle)
@@ -16,7 +16,11 @@ class Fish():
         self.time_step=0.1
         self.is_running=False
         self.world=world
-        self.identifier="fish" + str(randint(0,1000000))
+        self.potentials=[]
+        if identifier==None:
+            self.identifier="fish" + str(randint(0,1000000))
+        else:
+            self.identifier=identifier
         self.log=log
         #self.start()
     def _run(self):
@@ -45,14 +49,17 @@ class Fish():
     def evaluate_and_turn(self):
         zones = self.zone_check()
         goal_angle = self.angle
+        if self.log:
+            print "r: " + str(len(zones['repulse'])) + " o: " + str(len(zones['orient'])) + " a: " + str(len(zones['attract']))
         if len(zones['repulse']):
             goal_angle = self.repulse(zones['repulse'])
         elif len(zones['orient']):
             if len(zones['attract']):
-                goal_angle = 0.5 * (self.orient(zones['orient']) + self.attract(zones['attract']))
+                goal_angle = 0.5 * (self.orient(zones['orient'])/len(zones['orient']) + self.attract(zones['attract'])/len(zones['attract']))
             else:
                 goal_angle = self.orient(zones['orient'])
         elif len(zones['attract']):
+            print "JUST ATTRACT"
             goal_angle = self.attract(zones['attract'])
         if self.log:
             print "SA: " + str(self.angle) + " GA: " + str(goal_angle)
@@ -71,6 +78,8 @@ class Fish():
                     self.decrease_angle()
         if self.angle >= pi*2:
             self.angle -= pi*2
+        elif self.angle < 0:
+            self.angle += pi*2
     def move_forward(self):
         move_vector = self.speed*self.time_step
         eval_angle = self.angle
@@ -124,13 +133,13 @@ class Fish():
         angles = []
         for fish in fishes:
             angles.append(float(fish.angle))
-        return sum(angles) / len(angles)
+        return sum(angles)
     def unit_vector_sum(self, fishes):
         sum_x = 0
         sum_y = 0
         for fish in fishes:
-            diff_x = abs(self.x_position - fish.x_position)
-            diff_y = abs(self.y_position - fish.y_position)
+            diff_x = abs(fish.x_position - self.x_position)
+            diff_y = abs(fish.y_position - self.y_position)
             norm = self.get_distance(diff_x, diff_y, 0, 0)
             try:
                 sum_x += diff_x/norm
@@ -140,7 +149,7 @@ class Fish():
                 sum_y += diff_y/norm
             except ZeroDivisionError:
                 sum_y += 0
-        return sum_x/len(fishes), sum_y/len(fishes)
+        return sum_x, sum_y
     def zone_check(self):
         potentials = self.world.get_close_fishes(self)
         zones = {}
@@ -154,6 +163,7 @@ class Fish():
             elif distance <= self.world.unit*self.zone_orientation:
                 zones['orient'].append(p)
             elif distance <= self.world.unit*self.zone_attraction:
+                print "ATTRACT"
                 zones['attract'].append(p)
         return zones
 
