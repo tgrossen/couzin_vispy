@@ -30,14 +30,14 @@ class World():
             self.addFish(300, 600, 360-45, speed=speed)
             self.addFish(310, 610, 360-45, speed=speed)
             self.addFish(310, 600, 360-45, speed=speed)
-    def add_fish_swarm(self, count, speed=1):
+    def add_fish_swarm(self, count, log=False, speed=1):
         startX = 200
         startY = 200
         for x in range(0, count):
-            self.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(0, 360), speed=speed)
-    def add_random_fishes(self, count, speed=1):
+            self.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(0, 360), log=log, speed=speed)
+    def add_random_fishes(self, count, log=False, speed=1):
         for x in range(0, count):
-            self.addFish(randint(0, self.canvasWidth/2), randint(0, self.canvasHeight/2), randint(0, 360), speed=speed)
+            self.addFish(randint(0, self.canvasWidth/2), randint(0, self.canvasHeight/2), randint(0, 360), log=log, speed=speed)
     def addFish(self, x, y, angle, log=False, speed=1):
         fishy_fish = Fish(self, x, y, angle, log=log, speed=speed)
         #fishy_fish.start()
