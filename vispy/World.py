@@ -16,7 +16,6 @@ class World():
         self.addFish()
     def addFish(self, x, y, angle, log=False, speed=1):
         fishy_fish = Fish(self, x, y, angle, log=log, speed=speed)
-        #fishy_fish.start()
         self.fishes.append(fishy_fish)
     def dotproduct(self, v1, v2):
         return sum((a*b) for a, b in zip(v1, v2))

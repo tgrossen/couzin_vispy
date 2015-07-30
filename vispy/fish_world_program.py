@@ -28,7 +28,7 @@ void main() {
 n = 6
 
 desc=''' Example:
-    python fish_world_program.py --fishes 2
+    python fish_world_program.py -f 2 -s 3
     '''
 
 class Canvas(app.Canvas):
@@ -36,7 +36,10 @@ class Canvas(app.Canvas):
         app.Canvas.__init__(self, keys='interactive', size=(1024, 768))
         self.world = world
         ps = self.pixel_scale
-
+        self.repulsion = 1
+        self.orientation = 7
+        self.attraction = 15
+        self.speed = 1
         self.program = gloo.Program(VERT_SHADER, FRAG_SHADER)
         data = np.random.uniform(0, 0, size=(n, 2))
         self.a_position = data.astype(np.float32)
@@ -46,6 +49,43 @@ class Canvas(app.Canvas):
         self.timer = app.Timer('auto', connect=self.on_timer, start=True)
 
         self.show()
+
+    def change_repulsion(self):
+        if self.repulsion == 1:
+            self.repulsion = 3
+        else:
+            self.repulsion = 1
+        for fish in self.world.fishes:
+            fish.zone_repulsion = self.repulsion
+        print "zone_repulsion changed to: " + str(self.repulsion)
+
+    def change_orientation(self):
+        if self.orientation == 7:
+            self.orientation = 15
+        else:
+            self.orientation = 7
+        for fish in self.world.fishes:
+            fish.zone_orientation = self.orientation
+        print "zone_orientation changed to: " + str(self.orientation)
+
+    def change_attraction(self):
+        if self.attraction == 15:
+            self.attraction = 30
+        else:
+            self.attraction = 15
+        for fish in self.world.fishes:
+            fish.zone_attraction = self.attraction
+        print "zone_attraction changed to: " + str(self.attraction)
+
+    def increase_speed(self):
+        self.speed *= 2
+        for fish in self.world.fishes:
+            fish.speed = self.speed
+
+    def decrease_speed(self):
+        self.speed /= 2
+        for fish in self.world.fishes:
+            fish.speed = self.speed
 
     def on_key_press(self, event):
         if event.text == ' ':
@@ -57,6 +97,18 @@ class Canvas(app.Canvas):
                 self.timer.start()
                 for fish in self.world.fishes:
                     fish.start()
+        elif event.text == 'r':
+            self.change_repulsion()
+        elif event.text == 'o':
+            self.change_orientation()
+        elif event.text == 'a':
+            self.change_attraction()
+        elif event.text == 'q':
+            self.increase_speed()
+        elif event.text == 'w':
+            self.decrease_speed()
+
+
 
     def on_resize(self, event):
         width, height = event.size
@@ -75,13 +127,6 @@ class Canvas(app.Canvas):
             x += 1
         self.program['a_position'] = self.a_position
         self.update()
-
-def readCommandLine():
-    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--fishes', required=False, default=50, help='Number of fishes to use.')
-    parser.add_argument('--speed', required=False, default=1, help='Amount by which to multiply speed, turning angle, etc.')
-    parser.add_argument('--log', required=False, default=False, help='Boolean value for logging or no logging')
-    return parser.parse_args()
 
 def add_test_fishes(world, count, log=False, speed=1):
     if count == 2:
@@ -109,6 +154,13 @@ def add_random_fishes(world, count, log=False, speed=1):
     for x in range(0, count):
         world.addFish(randint(0, world.canvasWidth/2), randint(0, world.canvasHeight/2), randint(0, 360), log=log, speed=speed)
 
+def readCommandLine():
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--fishes', '-f', required=False, default=50, help='Number of fishes to use.')
+    parser.add_argument('--speed', '-s', required=False, default=1, help='Amount by which to multiply speed, turning angle, etc.')
+    parser.add_argument('--log', '-l', required=False, default=False, help='Boolean value for logging or no logging')
+    return parser.parse_args()
+
 if __name__ == '__main__':
     try:
         args = readCommandLine()
@@ -124,6 +176,7 @@ if __name__ == '__main__':
     world = World(1024, 768, 3)
     world.init_world()
     c = Canvas(world)
+    c.speed=speed
     if n < 50:
         add_test_fishes(world, n, log, speed)
     else:
