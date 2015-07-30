@@ -5,7 +5,7 @@ import sys
 from vispy import gloo
 from vispy import app
 import numpy as np
-import random
+import random, argparse
 from World import World
 from Fish import Fish
 
@@ -25,6 +25,10 @@ void main() {
 """
 
 n = 6
+
+desc=''' Example:
+    python fish_world_program.py --fishes 2
+    '''
 
 class Canvas(app.Canvas):
     def __init__(self, world):
@@ -71,11 +75,31 @@ class Canvas(app.Canvas):
         self.program['a_position'] = self.a_position
         self.update()
 
+def readCommandLine():
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--fishes', required=False, default=50, help='Number of fishes to use.')
+    parser.add_argument('--speed', required=False, default=1, help='Amount by which to multiply speed, turning angle, etc.')
+    parser.add_argument('--log', required=False, default=False, help='Boolean value for logging or no logging')
+    return parser.parse_args()
+
 if __name__ == '__main__':
+    try:
+        args = readCommandLine()
+    except:
+        print desc
+        raise
+    n = int(args.fishes)
+    speed = int(args.speed)
+    if args.log == False:
+        log = False
+    else:
+        log = True
     world = World(1024, 768, 3)
     world.init_world()
     c = Canvas(world)
-    #world.add_fish_swarm(n)
-    world.add_test_fishes(n)
+    if n < 50:
+        world.add_test_fishes(n, log, speed)
+    else:
+        world.add_fish_swarm(n, log, speed)
     if sys.flags.interactive != 1:
         app.run()

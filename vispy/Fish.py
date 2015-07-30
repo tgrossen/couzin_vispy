@@ -3,7 +3,7 @@ from math import pi
 from random import randint
 
 class Fish():
-    def __init__(self, world, x, y, angle, log=False):
+    def __init__(self, world, x, y, angle, log=False, speed=1):
         self.x_position=x
         self.y_position=y
         self.angle=math.radians(angle)
@@ -11,8 +11,8 @@ class Fish():
         self.zone_orientation=15
         self.zone_attraction=7
         self.field_perception=200
-        self.turning_rate=math.radians(150)
-        self.speed=3
+        self.turning_rate=math.radians(50*speed)
+        self.speed=3*speed
         self.time_step=0.1
         self.is_running=False
         self.world=world
@@ -60,7 +60,7 @@ class Fish():
             if abs(goal_angle - self.angle) <= self.turning_rate*self.time_step or (pi*2 - abs(goal_angle - self.angle)) <= self.turning_rate*self.time_step:
                 self.angle = goal_angle
             elif goal_angle > self.angle:
-                if goal_angle - self.angle > pi:
+                if abs(goal_angle - self.angle) > pi:
                     self.decrease_angle()
                 else:
                     self.increase_angle()
