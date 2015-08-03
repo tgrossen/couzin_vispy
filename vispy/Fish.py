@@ -61,7 +61,7 @@ class Fish():
         elif len(zones['attract']):
             goal_angle = self.attract(zones['attract'])
         if self.log:
-            print "SA: " + str(self.angle) + " GA: " + str(goal_angle)
+            print "SA: " + str(math.degrees(self.angle)) + " GA: " + str(math.degrees(goal_angle))
         if goal_angle != self.angle:
             if abs(goal_angle - self.angle) <= self.turning_rate*self.time_step or (pi*2 - abs(goal_angle - self.angle)) <= self.turning_rate*self.time_step:
                 self.angle = goal_angle
@@ -132,21 +132,23 @@ class Fish():
         angles = []
         for fish in fishes:
             angles.append(float(fish.angle))
-        return sum(angles)/len(angles)
+        return sum(angles) / len(fishes)
     def unit_vector_sum(self, fishes):
         sum_x = 0
         sum_y = 0
         for fish in fishes:
-            diff_x = abs(fish.x_position - self.x_position)
-            diff_y = abs(fish.y_position - self.y_position)
+            diff_x = fish.x_position - self.x_position
+            diff_y = fish.y_position - self.y_position
             norm = self.get_distance(diff_x, diff_y, 0, 0)
             try:
                 sum_x += diff_x/norm
             except ZeroDivisionError:
+                # print "zero1"
                 sum_x += 0
             try:
                 sum_y += diff_y/norm
             except ZeroDivisionError:
+                # print "zero2"
                 sum_y += 0
         return sum_x, sum_y
     def zone_check(self):

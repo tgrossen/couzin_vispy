@@ -132,7 +132,7 @@ class Canvas(app.Canvas):
 
 def add_test_fishes(world, count, log=False, speed=1):
     if count == 2:
-        world.addFish(50, 50, 90, speed=speed)
+        world.addFish(50, 50, 90, log=True, speed=speed)
         world.addFish(50, 250, 270, speed=speed)
     if count == 4:
         world.addFish(300, 300, 45, log=log, speed=speed, identifier=1)
