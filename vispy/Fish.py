@@ -10,9 +10,9 @@ class Fish():
         self.zone_repulsion=1
         self.zone_orientation=7
         self.zone_attraction=15
-        self.field_perception=200
+        self.field_perception=300
         self.turning_rate=math.radians(50*speed)
-        self.speed=3*speed
+        self.speed=3*speed*world.unit
         self.time_step=0.1
         self.is_running=False
         self.world=world
@@ -115,7 +115,6 @@ class Fish():
         elif self.y_position >= self.world.canvasHeight:
             self.y_position -= self.world.canvasHeight
     def move(self):
-        #threading.Timer(self.time_step, move, args=self).start()
         self.evaluate_and_turn()
         self.move_forward()
         self.world.WORLD[int(self.x_position)][int(self.y_position)] = 0
@@ -127,7 +126,7 @@ class Fish():
         return self.world.angle_from_origin(sum_x, sum_y)
     def attract(self, fishes):
         sum_x, sum_y = self.unit_vector_sum(fishes)
-        return self.world.angle_from_origin(sum_x, sum_y) / len(fishes)
+        return self.world.angle_from_origin(sum_x, sum_y)
     def orient(self, fishes):
         angles = []
         for fish in fishes:
@@ -137,20 +136,9 @@ class Fish():
         sum_x = 0
         sum_y = 0
         for fish in fishes:
-            diff_x = fish.x_position - self.x_position
-            diff_y = fish.y_position - self.y_position
-            norm = self.get_distance(diff_x, diff_y, 0, 0)
-            try:
-                sum_x += diff_x/norm
-            except ZeroDivisionError:
-                # print "zero1"
-                sum_x += 0
-            try:
-                sum_y += diff_y/norm
-            except ZeroDivisionError:
-                # print "zero2"
-                sum_y += 0
-        return sum_x, sum_y
+            sum_x += fish.x_position - self.x_position
+            sum_y += fish.y_position - self.y_position
+        return sum_x/len(fishes), sum_y/len(fishes)
     def zone_check(self):
         potentials = self.world.get_close_fishes(self)
         zones = {}

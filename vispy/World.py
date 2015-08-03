@@ -87,8 +87,8 @@ class World():
                 except ZeroDivisionError:
                     angle = 0
                 # field of perception is in both directions, so we make sure angle smaller than half the field of perception
-                if fish.log:
-                    print str(fish.identifier) + ": " + str(other_fish.identifier) + ": " + str(math.degrees(angle))
+                # if fish.log:
+                #     print str(fish.identifier) + ": " + str(other_fish.identifier) + ": " + str(math.degrees(angle))
                 if angle > math.radians(fish.field_perception/2):
                     # fish.potentials.remove(other_fish)
                     remove.append(other_fish.identifier)

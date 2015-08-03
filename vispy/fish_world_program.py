@@ -6,7 +6,7 @@ from vispy import gloo
 from vispy import app
 from random import randint
 import numpy as np
-import random, argparse
+import random, argparse, math
 from World import World
 from Fish import Fish
 
@@ -80,13 +80,15 @@ class Canvas(app.Canvas):
     def increase_speed(self):
         self.speed *= 2
         for fish in self.world.fishes:
-            fish.speed = self.speed
+            fish.turning_rate = math.radians(50*self.speed)
+            fish.speed = 3*self.speed*world.unit
         print "Speed increased to: " + str(self.speed)
 
     def decrease_speed(self):
         self.speed /= 2
         for fish in self.world.fishes:
-            fish.speed = self.speed
+            fish.turning_rate = math.radians(50*self.speed)
+            fish.speed = 3*self.speed*world.unit
         print "Speed decreased to: " + str(self.speed)
 
     def on_key_press(self, event):
@@ -105,12 +107,10 @@ class Canvas(app.Canvas):
             self.change_orientation()
         elif event.text == 'a':
             self.change_attraction()
-        elif event.text == 'q':
-            self.increase_speed()
-        elif event.text == 'w':
-            self.decrease_speed()
-
-
+        # elif event.text == 'q':
+        #     self.increase_speed()
+        # elif event.text == 'w':
+        #     self.decrease_speed()
 
     def on_resize(self, event):
         width, height = event.size
@@ -134,11 +134,20 @@ def add_test_fishes(world, count, log=False, speed=1):
     if count == 2:
         world.addFish(50, 50, 90, log=True, speed=speed)
         world.addFish(50, 250, 270, speed=speed)
+    if count == 3:
+        world.addFish(45, 50, 90, log=True, speed=speed)
+        world.addFish(55, 50, 90, speed=speed)
+        world.addFish(50, 250, 270, speed=speed)
+    # if count == 4:
+    #     world.addFish(300, 300, 45, log=log, speed=speed, identifier=1)
+    #     world.addFish(310, 310, 45, speed=speed, identifier=2)
+    #     world.addFish(310, 300, 45, speed=speed, identifier=3)
+    #     world.addFish(300, 600, 360-45, speed=speed, identifier=4)
     if count == 4:
-        world.addFish(300, 300, 45, log=log, speed=speed, identifier=1)
-        world.addFish(310, 310, 45, speed=speed, identifier=2)
-        world.addFish(310, 300, 45, speed=speed, identifier=3)
-        world.addFish(300, 600, 360-45, speed=speed, identifier=4)
+        world.addFish(300, 300, 90, log=log, speed=speed, identifier=1)
+        world.addFish(300, 700, 270, speed=speed, identifier=2)
+        world.addFish(100, 500, 0, speed=speed, identifier=3)
+        world.addFish(500, 500, 180, speed=speed, identifier=4)
     if count == 6:
         world.addFish(300, 300, 45, speed=speed)
         world.addFish(310, 310, 45, speed=speed)
@@ -151,7 +160,7 @@ def add_fish_swarm(world, count, log=False, speed=1):
     startX = 200
     startY = 200
     for x in range(0, count):
-        world.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(0, 360), log=log, speed=speed)
+        world.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(200, 230), log=log, speed=speed)
 def add_random_fishes(world, count, log=False, speed=1):
     for x in range(0, count):
         world.addFish(randint(0, world.canvasWidth/2), randint(0, world.canvasHeight/2), randint(0, 360), log=log, speed=speed)
