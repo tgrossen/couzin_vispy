@@ -144,8 +144,8 @@ def add_test_fishes(world, count, log=False, speed=1):
         world.addFish(310, 310, 45, speed=speed)
         world.addFish(310, 300, 45, speed=speed)
         world.addFish(300, 600, 360-45, speed=speed)
-        world.addFish(310, 610, 360-45, speed=speed)
-        world.addFish(310, 600, 360-45, log=log, speed=speed)
+        world.addFish(310, 610, 360-45, log=log, speed=speed)
+        world.addFish(310, 600, 360-45, speed=speed)
 
 def add_fish_swarm(world, count, log=False, speed=1):
     startX = 200

@@ -55,11 +55,10 @@ class Fish():
             goal_angle = self.repulse(zones['repulse'])
         elif len(zones['orient']):
             if len(zones['attract']):
-                goal_angle = 0.5 * (self.orient(zones['orient'])/len(zones['orient']) + self.attract(zones['attract'])/len(zones['attract']))
+                goal_angle = 0.5 * (self.orient(zones['orient']) + self.attract(zones['attract']))
             else:
                 goal_angle = self.orient(zones['orient'])
         elif len(zones['attract']):
-            print "JUST ATTRACT"
             goal_angle = self.attract(zones['attract'])
         if self.log:
             print "SA: " + str(self.angle) + " GA: " + str(goal_angle)
@@ -128,12 +127,12 @@ class Fish():
         return self.world.angle_from_origin(sum_x, sum_y)
     def attract(self, fishes):
         sum_x, sum_y = self.unit_vector_sum(fishes)
-        return self.world.angle_from_origin(sum_x, sum_y)
+        return self.world.angle_from_origin(sum_x, sum_y) / len(fishes)
     def orient(self, fishes):
         angles = []
         for fish in fishes:
             angles.append(float(fish.angle))
-        return sum(angles)
+        return sum(angles)/len(angles)
     def unit_vector_sum(self, fishes):
         sum_x = 0
         sum_y = 0
@@ -163,18 +162,7 @@ class Fish():
             elif distance <= self.world.unit*self.zone_orientation:
                 zones['orient'].append(p)
             elif distance <= self.world.unit*self.zone_attraction:
-                print "ATTRACT"
+                # print "ATTRACT"
                 zones['attract'].append(p)
         return zones
 
-# def monitor(fish, fish2, fish3):
-#     fish_x = 0
-#     fish_y = 0
-#     while True:
-#         if fish_x != fish.x_position or fish_y != fish.y_position:
-#             fish_x = fish.x_position
-#             fish_y = fish.y_position
-#             print fish_x, fish_y, fish.angle
-#             print fish2.x_position, fish2.y_position, fish2.angle
-#             print fish3.x_position, fish3.y_position, fish3.angle
-#             print ""
