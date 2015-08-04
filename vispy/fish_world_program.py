@@ -37,8 +37,8 @@ class Canvas(app.Canvas):
         self.world = world
         ps = self.pixel_scale
         self.repulsion = 1
-        self.orientation = 7
-        self.attraction = 15
+        self.orientation = 0
+        self.attraction = 14
         self.speed = 1
         self.program = gloo.Program(VERT_SHADER, FRAG_SHADER)
         data = np.random.uniform(0, 0, size=(n, 2))
@@ -59,14 +59,17 @@ class Canvas(app.Canvas):
             fish.zone_repulsion = self.repulsion
         print "zone_repulsion changed to: " + str(self.repulsion)
 
-    def change_orientation(self):
-        if self.orientation == 7:
-            self.orientation = 15
-        else:
-            self.orientation = 7
+    def increase_orientation(self):
+        self.orientation += .5
         for fish in self.world.fishes:
             fish.zone_orientation = self.orientation
-        print "zone_orientation changed to: " + str(self.orientation)
+        print "zone_orientation increased to: " + str(self.orientation)
+
+    def decrease_orientation(self):
+        self.orientation -= .5
+        for fish in self.world.fishes:
+            fish.zone_orientation = self.orientation
+        print "zone_orientation decreased to: " + str(self.orientation)
 
     def change_attraction(self):
         if self.attraction == 15:
@@ -104,7 +107,9 @@ class Canvas(app.Canvas):
         elif event.text == 'r':
             self.change_repulsion()
         elif event.text == 'o':
-            self.change_orientation()
+            self.increase_orientation()
+        elif event.text == 'l':
+            self.decrease_orientation()
         elif event.text == 'a':
             self.change_attraction()
         # elif event.text == 'q':
@@ -157,10 +162,10 @@ def add_test_fishes(world, count, log=False, speed=1):
         world.addFish(310, 600, 360-45, speed=speed)
 
 def add_fish_swarm(world, count, log=False, speed=1):
-    startX = 200
-    startY = 200
+    startX = world.canvasWidth/2
+    startY = world.canvasHeight/2
     for x in range(0, count):
-        world.addFish(startX + randint(-count,count), startY + randint(-count,count), randint(200, 230), log=log, speed=speed)
+        world.addFish(startX + randint(-count/2,count/2), startY + randint(-count/2,count/2), 200, log=log, speed=speed)
 def add_random_fishes(world, count, log=False, speed=1):
     for x in range(0, count):
         world.addFish(randint(0, world.canvasWidth/2), randint(0, world.canvasHeight/2), randint(0, 360), log=log, speed=speed)
