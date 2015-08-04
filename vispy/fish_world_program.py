@@ -109,7 +109,8 @@ class Canvas(app.Canvas):
         elif event.text == 'o':
             self.increase_orientation()
         elif event.text == 'l':
-            self.decrease_orientation()
+            if self.orientation > 0:
+                self.decrease_orientation()
         elif event.text == 'a':
             self.change_attraction()
         # elif event.text == 'q':
@@ -144,15 +145,15 @@ def add_test_fishes(world, count, log=False, speed=1):
         world.addFish(55, 50, 90, speed=speed)
         world.addFish(50, 250, 270, speed=speed)
     # if count == 4:
-    #     world.addFish(300, 300, 45, log=log, speed=speed, identifier=1)
-    #     world.addFish(310, 310, 45, speed=speed, identifier=2)
-    #     world.addFish(310, 300, 45, speed=speed, identifier=3)
-    #     world.addFish(300, 600, 360-45, speed=speed, identifier=4)
+    #     world.addFish(300, 300, 45, log=log, speed=speed)
+    #     world.addFish(310, 310, 45, speed=speed)
+    #     world.addFish(310, 300, 45, speed=speed)
+    #     world.addFish(300, 600, 360-45, speed=speed)
     if count == 4:
-        world.addFish(300, 300, 90, log=log, speed=speed, identifier=1)
-        world.addFish(300, 700, 270, speed=speed, identifier=2)
-        world.addFish(100, 500, 0, speed=speed, identifier=3)
-        world.addFish(500, 500, 180, speed=speed, identifier=4)
+        world.addFish(300, 300, 90, log=log, speed=speed)
+        world.addFish(300, 700, 270, speed=speed)
+        world.addFish(100, 500, 0, speed=speed)
+        world.addFish(500, 500, 180, speed=speed)
     if count == 6:
         world.addFish(300, 300, 45, speed=speed)
         world.addFish(310, 310, 45, speed=speed)
