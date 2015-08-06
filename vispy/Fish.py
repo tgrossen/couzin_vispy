@@ -8,7 +8,7 @@ class Fish():
         self.y_position=y
         self.angle=math.radians(angle)
         self.zone_repulsion=1
-        self.zone_orientation=0
+        self.zone_orientation=7
         self.zone_attraction=14
         self.field_perception=300
         self.turning_rate=math.radians(20*speed)
@@ -18,7 +18,6 @@ class Fish():
         self.world=world
         self.potentials=[]
         self.identifier="fish" + str(randint(0,1000000))
-        self.identifier=identifier
         self.log=log
 
     def _run(self):

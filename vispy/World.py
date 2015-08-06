@@ -14,7 +14,7 @@ class World():
         self.fishes = []
     
     def addFish(self, x, y, angle, log=False, speed=1, identifier=None):
-        fishy_fish = Fish(self, x, y, angle, log=log, speed=speed, identifier=identifier)
+        fishy_fish = Fish(self, x, y, angle, log=log, speed=speed)
         self.fishes.append(fishy_fish)
     
     def dotproduct(self, v1, v2):
