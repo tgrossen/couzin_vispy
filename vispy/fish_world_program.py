@@ -37,7 +37,7 @@ class Canvas(app.Canvas):
         self.world = world
         ps = self.pixel_scale
         self.repulsion = 1
-        self.orientation = 0
+        self.orientation =7
         self.attraction = 14
         self.speed = 1
         self.program = gloo.Program(VERT_SHADER, FRAG_SHADER)
@@ -138,29 +138,25 @@ class Canvas(app.Canvas):
 
 def add_test_fishes(world, count, log=False, speed=1):
     if count == 2:
-        world.addFish(50, 50, 90, log=True, speed=speed)
-        world.addFish(50, 250, 270, speed=speed)
+        world.addFish(50, 300, 270, speed=speed)         
+        world.addFish(50, 100, 90, speed=speed)
     if count == 3:
-        world.addFish(45, 50, 90, log=True, speed=speed)
-        world.addFish(55, 50, 90, speed=speed)
-        world.addFish(50, 250, 270, speed=speed)
-    # if count == 4:
-    #     world.addFish(300, 300, 45, log=log, speed=speed)
-    #     world.addFish(310, 310, 45, speed=speed)
-    #     world.addFish(310, 300, 45, speed=speed)
-    #     world.addFish(300, 600, 360-45, speed=speed)
-    if count == 4:
-        world.addFish(300, 300, 90, log=log, speed=speed)
-        world.addFish(300, 700, 270, speed=speed)
-        world.addFish(100, 500, 0, speed=speed)
-        world.addFish(500, 500, 180, speed=speed)
-    if count == 6:
         world.addFish(300, 300, 45, speed=speed)
         world.addFish(310, 310, 45, speed=speed)
         world.addFish(310, 300, 45, speed=speed)
-        world.addFish(300, 600, 360-45, speed=speed)
-        world.addFish(310, 610, 360-45, log=log, speed=speed)
-        world.addFish(310, 600, 360-45, speed=speed)
+    if count == 40:
+        startX = world.canvasWidth/2
+        startY = world.canvasHeight/2
+        currX = startX
+        currY = startY
+        for x in range(0, count/2):
+            currX+= 10
+            world.addFish(currX, currY, 200, speed=speed, log=log)
+        currX = startX
+        currY = startY
+        for x in range(0, count/2):
+            currY-= 10
+            world.addFish(currX, currY, 200, speed=speed, log=log)
 
 def add_fish_swarm(world, count, log=False, speed=1):
     startX = world.canvasWidth/2
